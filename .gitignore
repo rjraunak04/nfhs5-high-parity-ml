@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Licensed or potentially sensitive survey data
+*.dta
+*.DTA
+*.sav
+*.SAV
+*.sas7bdat
+data/*
+!data/README.md
+!data/demo_batch.csv
+
+# Large/local ML outputs
+outputs/
+artifacts/
+checkpoints/
+mlruns/
+*.sqlite3
+*.db
+*.pkl
+*.joblib
+!models/demo_transport_model.joblib
+models/*.json
+!models/demo_model_metadata.json
+
+# Notebook and OS noise
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db

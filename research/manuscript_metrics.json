@@ -1,0 +1,33 @@
+{
+  "source": "NFHS5_High_Parity_Revised_Manuscript.pdf plus the author's threshold-result clarification",
+  "outcome": "observed high parity at interview: children ever born >= 3",
+  "india_rows": 724115,
+  "nepal_rows": 14845,
+  "india_primary": {
+    "features": ["current_age", "residence", "education", "wealth", "religion", "caste", "state"],
+    "nested_cv_auc_mean": 0.8811,
+    "nested_cv_auc_sd": 0.0028,
+    "holdout_auc": 0.8839,
+    "holdout_brier": 0.1445,
+    "locked_threshold": 0.4890
+  },
+  "transport": {
+    "features": ["current_age", "residence", "education", "wealth", "in_union"],
+    "india_holdout_auc": 0.8708,
+    "india_holdout_brier": 0.1531,
+    "nepal_auc": 0.8488,
+    "nepal_auc_ci": [0.8426, 0.8542],
+    "nepal_brier": 0.1523,
+    "nepal_weighted_auc": 0.8357,
+    "nepal_weighted_brier": 0.1502,
+    "nepal_calibration_intercept": 0.3846,
+    "nepal_calibration_slope": 0.7272,
+    "locked_threshold": 0.4694
+  },
+  "interpretation_guards": [
+    "cross-sectional classification, not future fertility prediction",
+    "SHAP associations are not causal effects",
+    "Nepal probabilities require local recalibration",
+    "manuscript metrics must not be attributed to the synthetic demo artifact"
+  ]
+}

@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite this repository and the associated manuscript when available."
+title: "Explainable High-Parity Classification with NFHS-5"
+type: software
+authors:
+  - family-names: Jaiswal
+    given-names: Ankur Kumar
+version: 0.1.0
+date-released: 2026-09-13
+license: MIT

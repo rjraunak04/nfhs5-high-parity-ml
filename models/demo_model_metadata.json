@@ -1,0 +1,33 @@
+{
+  "model_version": "demo-synthetic-v1",
+  "training_source": "deterministic synthetic DHS-shaped records",
+  "demo_only": true,
+  "features": [
+    "current_age",
+    "residence",
+    "education",
+    "wealth",
+    "in_union"
+  ],
+  "threshold": 0.40219721400035713,
+  "random_state": 42,
+  "python_version": "3.12.14",
+  "scikit_learn_version": "1.8.0",
+  "training_rows": 4800,
+  "test_rows": 1200,
+  "metrics": {
+    "auc_roc": 0.7699659752912816,
+    "brier_score": 0.1581122089074988,
+    "accuracy": 0.705,
+    "f1": 0.3832752613240418,
+    "threshold": 0.40219721400035713
+  },
+  "global_feature_importance": {
+    "current_age": 0.7670746123014516,
+    "wealth": 0.07458444639692804,
+    "in_union": 0.07224055837991836,
+    "education": 0.06030095529826319,
+    "residence": 0.025799427623438856
+  },
+  "intended_use": "software demonstration and portfolio review only"
+}

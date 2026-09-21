@@ -1,0 +1,33 @@
+project_name: nfhs5-high-parity-classification
+random_state: 42
+
+outcome:
+  source_column: v201
+  definition: children_ever_born >= 3
+  interpretation: observed high parity at interview
+
+primary_india:
+  raw_features: [v012, v025, v106, v130, v190, v024, s116]
+  feature_names: [current_age, residence, education, religion, wealth, state, caste]
+  outer_folds: 5
+  inner_folds: 3
+  holdout_fraction: 0.20
+  tuning_trials: 10
+  class_strategy: balanced_class_weights
+
+transport:
+  raw_features: [v012, v025, v106, v190, v501]
+  feature_names: [current_age, residence, education, wealth, in_union]
+  validation_country: Nepal
+
+blocked_primary_predictors:
+  - v201
+  - children_ever_born
+  - v212
+  - v511
+  - v509
+  - v312
+  - v313
+  - v602
+  - v613
+  - v621

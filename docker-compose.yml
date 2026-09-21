@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      FERTILITY_MODEL_PATH: /app/models/demo_transport_model.joblib
+
+  dashboard:
+    build: .
+    command:
+      - streamlit
+      - run
+      - app/dashboard.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+    ports:
+      - "8501:8501"
+    environment:
+      FERTILITY_MODEL_PATH: /app/models/demo_transport_model.joblib
