@@ -2,11 +2,34 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB.svg)](https://www.python.org/)
 [![CI](https://github.com/rjraunak04/nfhs5-high-parity-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/rjraunak04/nfhs5-high-parity-ml/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/Streamlit-Live%20Demo-FF4B4B?logo=streamlit&logoColor=white)](https://nfhs5-high-parity-ml.streamlit.app/)
+[![Release](https://img.shields.io/github/v/release/rjraunak04/nfhs5-high-parity-ml)](https://github.com/rjraunak04/nfhs5-high-parity-ml/releases/tag/v0.1.0)
 [![License: MIT](https://img.shields.io/badge/code%20license-MIT-green.svg)](LICENSE)
 
 A production-minded machine-learning project that turns large DHS survey research into a reproducible training pipeline, validated model artifact, REST API, and interactive dashboard.
 
 > This system classifies **observed high parity at the survey interview** (`children ever born >= 3`). It does not predict future fertility, establish causality, or provide clinical advice.
+
+**[Open the live synthetic-data demo](https://nfhs5-high-parity-ml.streamlit.app/)** · **[View the v0.1.0 release](https://github.com/rjraunak04/nfhs5-high-parity-ml/releases/tag/v0.1.0)**
+
+## Project at a glance
+
+| Area | Implementation |
+|---|---|
+| Research design | Leakage-safe nested validation, protected holdout, geographic validation |
+| Data engineering | Column-subset Stata ingestion for a 724,115-row NFHS-5 cohort |
+| Modelling | Versioned scikit-learn pipelines with locked out-of-fold thresholds |
+| Evaluation | ROC AUC, Brier score, calibration, bootstrap uncertainty, subgroup checks |
+| Serving | Typed FastAPI endpoints and a validated Streamlit batch/single-record UI |
+| MLOps | Docker Compose, GitHub Actions, deterministic demo artifact, release checks |
+| Governance | Model card, data card, schema contracts, no licensed microdata in Git |
+
+### Recruiter quick tour
+
+1. Try the **[live dashboard](https://nfhs5-high-parity-ml.streamlit.app/)** with its default synthetic record.
+2. Review the [architecture](docs/ARCHITECTURE.md) and [model card](docs/MODEL_CARD.md).
+3. Inspect the production entry points: [FastAPI](app/api.py), [Streamlit](app/dashboard.py), and [inference contract](src/fertility_risk/inference.py).
+4. See the automated [tests](tests/) and [CI workflow](.github/workflows/ci.yml).
 
 ![Published performance summary](docs/assets/performance_summary.png)
 
@@ -175,12 +198,6 @@ tests/                  Schema, inference, API, and leakage tests
 - Data policy: raw `.DTA`, local outputs, caches, and fitted research models are ignored by Git
 - Artifact contract: every model bundle contains features, threshold, version, training source, and demo/research status
 - Interpretation: model explanations are associations within the fitted model, not intervention effects
-
-## Three-day build sequence
-
-Follow [the exact three-day execution and commit plan](docs/THREE_DAY_PLAN.md). It is designed to produce meaningful commits without manufacturing activity just to make the contribution graph greener.
-
-Completion evidence: [Day 1](docs/DAY1_COMPLETION.md) · [Day 2](docs/DAY2_COMPLETION.md) · [Day 3](docs/DAY3_COMPLETION.md)
 
 ## Author
 
