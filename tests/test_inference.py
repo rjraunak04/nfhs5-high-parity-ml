@@ -1,6 +1,11 @@
 import pytest
 
-from fertility_risk.inference import load_model_bundle, predict_records
+from fertility_risk.constants import MODEL_FEATURES
+from fertility_risk.inference import (
+    load_model_bundle,
+    load_or_create_demo_bundle,
+    predict_records,
+)
 
 
 def test_model_bundle_roundtrip(demo_model_path):
@@ -24,3 +29,10 @@ def test_model_bundle_roundtrip(demo_model_path):
 def test_inference_requires_exact_feature_contract(demo_bundle):
     with pytest.raises(ValueError, match="Feature contract mismatch"):
         predict_records(demo_bundle, [{"current_age": 31}])
+
+
+def test_missing_demo_artifact_is_created(tmp_path):
+    model_path = tmp_path / "models" / "demo.joblib"
+    bundle = load_or_create_demo_bundle(model_path, expected_features=MODEL_FEATURES)
+    assert model_path.is_file()
+    assert bundle["metadata"]["demo_only"] is True

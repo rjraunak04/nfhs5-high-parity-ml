@@ -15,7 +15,7 @@ from fertility_risk.constants import (
     UNION_LABELS,
     WEALTH_LABELS,
 )
-from fertility_risk.inference import load_model_bundle, predict_records
+from fertility_risk.inference import load_or_create_demo_bundle, predict_records
 from fertility_risk.schemas import PredictionRequest
 
 MODEL_PATH = os.getenv("FERTILITY_MODEL_PATH", "models/demo_transport_model.joblib")
@@ -25,7 +25,7 @@ st.set_page_config(page_title="High-Parity ML Demo", page_icon="📊", layout="w
 
 @st.cache_resource
 def get_bundle():
-    return load_model_bundle(MODEL_PATH, expected_features=MODEL_FEATURES)
+    return load_or_create_demo_bundle(MODEL_PATH, expected_features=MODEL_FEATURES)
 
 
 bundle = get_bundle()

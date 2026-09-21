@@ -12,6 +12,21 @@ import pandas as pd
 import sklearn
 
 from .constants import MODEL_FEATURES
+from .modeling import train_demo_bundle
+
+
+def load_or_create_demo_bundle(
+    path: str | Path,
+    *,
+    expected_features: list[str] | None = None,
+) -> dict[str, Any]:
+    """Load the synthetic demo artifact, creating it deterministically when absent."""
+
+    model_path = Path(path)
+    if not model_path.is_file():
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(train_demo_bundle(), model_path, compress=3)
+    return load_model_bundle(model_path, expected_features=expected_features)
 
 
 def load_model_bundle(

@@ -33,7 +33,6 @@ mlruns/
 *.db
 *.pkl
 *.joblib
-!models/demo_transport_model.joblib
 models/*.json
 !models/demo_model_metadata.json
 

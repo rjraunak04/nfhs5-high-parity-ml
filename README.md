@@ -18,7 +18,7 @@ A production-minded machine-learning project that turns large DHS survey researc
 - Uses nested cross-validation plus a protected holdout set.
 - Separates the seven-feature India research model from the five-feature India-to-Nepal transport model.
 - Reports discrimination, probability accuracy, calibration, bootstrap uncertainty, and subgroup performance.
-- Ships with a working synthetic-data demo, typed API, dashboard, Docker setup, tests, and CI.
+- Ships with a deterministic synthetic-data demo, typed API, dashboard, Docker setup, tests, and CI.
 - Keeps licensed DHS microdata, fitted research artifacts, and direct identifiers out of Git.
 
 ## Research results
@@ -109,6 +109,9 @@ Example response:
 ```
 
 The exact probability and demo threshold can change when the synthetic artifact is regenerated.
+
+The safe synthetic artifact is generated automatically on first startup when it is absent, so
+deployments never depend on committing a large binary model file.
 
 ## Train with approved DHS data
 

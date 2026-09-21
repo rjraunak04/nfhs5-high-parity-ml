@@ -8,7 +8,7 @@ from functools import lru_cache
 from fastapi import FastAPI
 
 from fertility_risk.constants import MODEL_FEATURES
-from fertility_risk.inference import load_model_bundle, predict_records
+from fertility_risk.inference import load_or_create_demo_bundle, predict_records
 from fertility_risk.schemas import (
     BatchPredictionRequest,
     BatchPredictionResponse,
@@ -43,7 +43,7 @@ def root() -> dict:
 
 @lru_cache(maxsize=1)
 def get_bundle():
-    return load_model_bundle(
+    return load_or_create_demo_bundle(
         os.getenv("FERTILITY_MODEL_PATH", DEFAULT_MODEL_PATH),
         expected_features=MODEL_FEATURES,
     )

@@ -5,8 +5,8 @@ Date: 2026-09-21
 ## Release gate
 
 - Ruff: passed.
-- Pytest: 12 passed.
-- Source coverage: 54% overall; serving, schema, modelling, and inference paths are covered.
+- Pytest: 13 passed.
+- Source coverage: 55% overall; serving, schema, modelling, and inference paths are covered.
 - API process: `/health` returned HTTP 200.
 - Dashboard process: Streamlit health returned HTTP 200.
 - Prediction smoke test: returned a typed synthetic-demo prediction.
@@ -14,6 +14,7 @@ Date: 2026-09-21
 - Secret-pattern scan: no detected GitHub, AWS, or private-key signatures.
 - Git ignore verification: `.DTA`, `.env`, and local outputs are excluded.
 - Streamlit telemetry disabled and CORS protection enabled.
+- Missing synthetic demo artifacts regenerate deterministically on first startup.
 
 ## Release contents
 
