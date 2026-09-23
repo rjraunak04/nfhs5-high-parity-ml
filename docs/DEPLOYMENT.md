@@ -1,13 +1,20 @@
 # Deployment guide
 
-## Local production-like run
+The repository supports two public surfaces:
+
+- **Streamlit dashboard** for interactive scoring, batch uploads, and the research agent.
+- **FastAPI service** for typed programmatic access.
+
+The default deployment uses a deterministic synthetic model. It does not require DHS data or an API key.
+
+## Local production-style check
 
 ```bash
 python scripts/train_demo_model.py
 docker compose up --build
 ```
 
-Confirm:
+Verify the API:
 
 ```bash
 curl http://localhost:8000/health
@@ -17,20 +24,21 @@ curl -X POST http://localhost:8000/v1/agent/chat \
   -d '{"message":"How was the model validated?"}'
 ```
 
+Open the dashboard at `http://localhost:8501`.
+
 ## Streamlit Community Cloud
 
-1. Push the repository to GitHub.
-2. Create a Streamlit app from that repository.
+1. Connect this GitHub repository in Streamlit Community Cloud.
+2. Choose the `main` branch.
 3. Set the entry point to `app/dashboard.py`.
-4. Keep `requirements.txt`, `models/demo_transport_model.joblib`, and the package source in the repository.
-5. After deployment, open the app from an incognito window and test one valid and one invalid input.
+4. Deploy without secrets for deterministic local routing.
+5. Test all three tabs from an incognito window.
 
-No secret or DHS file is required for the default synthetic demo.
+The application generates its safe synthetic artifact automatically when it is absent. Licensed data and research-model artifacts must never be uploaded to Streamlit Cloud.
 
 ### Optional LLM routing
 
-The deployed app remains deterministic unless all three values are configured as environment
-secrets:
+The agent remains deterministic unless all three deployment secrets are configured:
 
 ```text
 FERTILITY_ENABLE_LLM=true
@@ -38,34 +46,37 @@ FERTILITY_LLM_MODEL=gpt-4o-mini
 OPENAI_API_KEY=<deployment secret>
 ```
 
-Never place the API key in GitHub files, Docker build arguments, screenshots, logs, or the dashboard.
-If the provider is unavailable, the app automatically returns to deterministic routing. Confirm the
-active provider in the dashboard's **Planner decision** panel.
+Never place an API key in source files, screenshots, Docker build arguments, or logs. If the provider is unavailable, routing automatically falls back to the local English/Hinglish planner.
 
-## Container service
-
-Build and run only the API image:
+## Container API
 
 ```bash
-docker build -t nfhs5-high-parity-api:0.1.0 .
-docker run --rm -p 8000:8000 nfhs5-high-parity-api:0.1.0
+docker build -t nfhs5-high-parity-api:0.2.0 .
+docker run --rm -p 8000:8000 nfhs5-high-parity-api:0.2.0
 ```
 
-A managed container host must route its public port to container port `8000` and use `/health` for health checks.
+Configure the hosting platform to:
 
-## Release evidence
+- expose container port `8000`;
+- use `/health` for health checks;
+- restart unhealthy instances;
+- supply secrets through its secret manager;
+- retain application logs without recording submitted profiles.
 
-Before sharing the repository with recruiters, add:
-
-- live dashboard URL in the GitHub About section;
-- a dashboard screenshot below the README architecture;
-- a green Actions badge using the repository's real workflow URL;
-- a tagged release (`v0.1.0`);
-- a short demo recording in LinkedIn Featured.
-
-Before every agent-enabled release, also run:
+## Pre-release checklist
 
 ```bash
-python scripts/evaluate_agent.py
+ruff check .
 pytest
+python scripts/evaluate_agent.py
+docker build -t nfhs5-high-parity-api:check .
 ```
+
+Then verify:
+
+- GitHub Actions is green on the release commit;
+- the live dashboard loads all tabs;
+- one valid and one invalid record behave correctly;
+- the agent displays its tool trace and disclaimer;
+- the README, package version, and release notes agree;
+- no raw data, model secrets, local outputs, or credentials are tracked.
