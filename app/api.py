@@ -5,11 +5,17 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
+from fertility_risk.agent import ResearchAgent
 from fertility_risk.constants import MODEL_FEATURES
 from fertility_risk.inference import load_or_create_demo_bundle, predict_records
+from fertility_risk.planner import plan_message_with_fallback
 from fertility_risk.schemas import (
+    AgentChatRequest,
+    AgentChatResponse,
+    AgentRequest,
+    AgentResponse,
     BatchPredictionRequest,
     BatchPredictionResponse,
     HealthResponse,
@@ -87,3 +93,29 @@ def predict_batch(request: BatchPredictionRequest) -> BatchPredictionResponse:
     records = [record.model_dump() for record in request.records]
     predictions = [PredictionResponse(**row) for row in predict_records(get_bundle(), records)]
     return BatchPredictionResponse(predictions=predictions, count=len(predictions))
+
+
+@app.post("/v1/agent/run", response_model=AgentResponse, tags=["agent"])
+def run_agent(request: AgentRequest) -> AgentResponse:
+    """Run the auditable single-agent workflow over allow-listed model tools."""
+    return ResearchAgent(get_bundle()).run(request)
+
+
+@app.post("/v1/agent/chat", response_model=AgentChatResponse, tags=["agent"])
+def chat_with_agent(request: AgentChatRequest) -> AgentChatResponse:
+    """Plan an English/Hinglish request, then execute it through approved tools."""
+    plan = plan_message_with_fallback(request.message)
+    if plan.intent == "assess_risk" and request.record is None:
+        raise HTTPException(status_code=422, detail="This request needs one scenario record.")
+    if plan.intent == "compare_scenarios" and (
+        request.record is None or request.comparison_record is None
+    ):
+        raise HTTPException(status_code=422, detail="Comparison needs two scenario records.")
+    agent_request = AgentRequest(
+        intent=plan.intent,
+        record=request.record,
+        comparison_record=request.comparison_record,
+        question=request.message,
+    )
+    response = ResearchAgent(get_bundle()).run(agent_request)
+    return AgentChatResponse(plan=plan, response=response)

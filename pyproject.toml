@@ -35,6 +35,9 @@ explain = [
   "matplotlib>=3.8,<4",
   "shap>=0.46,<1",
 ]
+llm = [
+  "openai>=2,<3",
+]
 dev = [
   "httpx>=0.27,<1",
   "pytest>=8,<10",

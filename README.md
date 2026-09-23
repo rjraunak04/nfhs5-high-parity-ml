@@ -21,6 +21,7 @@ A production-minded machine-learning project that turns large DHS survey researc
 | Modelling | Versioned scikit-learn pipelines with locked out-of-fold thresholds |
 | Evaluation | ROC AUC, Brier score, calibration, bootstrap uncertainty, subgroup checks |
 | Serving | Typed FastAPI endpoints and a validated Streamlit batch/single-record UI |
+| Agentic AI | Auditable single-agent orchestration over allow-listed ML and research tools |
 | MLOps | Docker Compose, GitHub Actions, deterministic demo artifact, release checks |
 | Governance | Model card, data card, schema contracts, no licensed microdata in Git |
 
@@ -29,7 +30,7 @@ A production-minded machine-learning project that turns large DHS survey researc
 1. Try the **[live dashboard](https://nfhs5-high-parity-ml.streamlit.app/)** with its default synthetic record.
 2. Review the [architecture](docs/ARCHITECTURE.md) and [model card](docs/MODEL_CARD.md).
 3. Inspect the production entry points: [FastAPI](app/api.py), [Streamlit](app/dashboard.py), and [inference contract](src/fertility_risk/inference.py).
-4. See the automated [tests](tests/) and [CI workflow](.github/workflows/ci.yml).
+4. Review the [single-agent guide](docs/AGENT_GUIDE.md), automated [tests](tests/), and [CI workflow](.github/workflows/ci.yml).
 
 ![Published performance summary](docs/assets/performance_summary.png)
 
@@ -132,6 +133,64 @@ Example response:
 ```
 
 The exact probability and demo threshold can change when the synthetic artifact is regenerated.
+
+## Single-agent research assistant
+
+The API includes a safe agent foundation that orchestrates the model instead of asking an LLM to
+invent a prediction. Every response exposes its tool trace, model version, demo status, and safety
+boundary.
+
+```bash
+curl -X POST http://localhost:8000/v1/agent/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "intent": "assess_risk",
+    "record": {
+      "current_age": 31,
+      "residence": 2,
+      "education": 2,
+      "wealth": 3,
+      "in_union": 1
+    }
+  }'
+```
+
+The live dashboard's **Agent assistant** tab supports assessment, scenario comparison, and curated
+methodology questions. It displays the tools used for every answer so recruiters can inspect the
+workflow rather than treating it as an opaque chatbot.
+
+Its transparent natural-language planner understands short English/Hinglish requests and exposes
+the selected intent, confidence, routing reason, and proposed tools before execution. The public
+demo needs no LLM API key and cannot generate or modify model probabilities.
+See the [architecture notes](docs/ARCHITECTURE.md#single-agent-architecture) for its safety design.
+
+### Optional LLM planner
+
+The app can optionally use OpenAI Structured Outputs for intent routing while preserving the same
+allow-listed tools and deterministic fallback:
+
+```bash
+pip install -e ".[app,llm]"
+export FERTILITY_ENABLE_LLM=true
+export FERTILITY_LLM_MODEL=gpt-4o-mini
+export OPENAI_API_KEY="your-secret-key"
+```
+
+Keep the key in a deployment secret manager—never commit it or place it in Streamlit source files.
+If the feature flag is off, the key is absent, the SDK is unavailable, or the provider call fails,
+the application continues with the local English/Hinglish planner.
+
+### Agent evaluation and reports
+
+Run the offline intent-routing, safe-fallback, and tool-alignment gate with:
+
+```bash
+python scripts/evaluate_agent.py
+```
+
+Methodology questions retrieve evidence from approved repository documentation and return source
+paths, section names, and excerpts. Every completed workflow also produces a downloadable JSON
+audit report containing the model version, demo status, tools executed, result, and disclaimer.
 
 The safe synthetic artifact is generated automatically on first startup when it is absent, so
 deployments never depend on committing a large binary model file.

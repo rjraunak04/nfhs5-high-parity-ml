@@ -1,6 +1,8 @@
-"""Typed input and output contracts shared by the API and dashboard."""
+"""Typed input and output contracts shared by the API, dashboard, and agent."""
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class PredictionRequest(BaseModel):
@@ -38,3 +40,65 @@ class HealthResponse(BaseModel):
     status: str
     model_version: str
     demo_only: bool
+
+
+class AgentRequest(BaseModel):
+    """A constrained request for the single-agent research assistant."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    intent: Literal["assess_risk", "compare_scenarios", "methodology"]
+    record: PredictionRequest | None = None
+    comparison_record: PredictionRequest | None = None
+    question: str | None = Field(default=None, max_length=500)
+
+    @model_validator(mode="after")
+    def validate_intent_inputs(self):
+        if self.intent == "assess_risk" and self.record is None:
+            raise ValueError("record is required for assess_risk")
+        if self.intent == "compare_scenarios" and (
+            self.record is None or self.comparison_record is None
+        ):
+            raise ValueError(
+                "record and comparison_record are required for compare_scenarios"
+            )
+        return self
+
+
+class AgentToolCall(BaseModel):
+    tool: str
+    status: Literal["completed"] = "completed"
+
+
+class AgentResponse(BaseModel):
+    intent: str
+    answer: str
+    result: dict
+    tool_calls: list[AgentToolCall]
+    model_version: str
+    demo_only: bool
+    disclaimer: str
+    report: dict
+
+
+class AgentChatRequest(BaseModel):
+    """Natural-language request plus optional structured scenario context."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    message: str = Field(min_length=3, max_length=500)
+    record: PredictionRequest | None = None
+    comparison_record: PredictionRequest | None = None
+
+
+class AgentPlan(BaseModel):
+    intent: Literal["assess_risk", "compare_scenarios", "methodology"]
+    confidence: float = Field(ge=0, le=1)
+    reason: str
+    required_tools: list[str]
+    provider: Literal["deterministic", "openai"] = "deterministic"
+
+
+class AgentChatResponse(BaseModel):
+    plan: AgentPlan
+    response: AgentResponse

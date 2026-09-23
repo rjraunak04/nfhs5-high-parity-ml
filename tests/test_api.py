@@ -78,3 +78,53 @@ def test_batch_prediction_and_size_validation(monkeypatch, demo_model_path):
 
     empty_response = client.post("/v1/predict/batch", json={"records": []})
     assert empty_response.status_code == 422
+
+
+def test_agent_endpoint(monkeypatch, demo_model_path):
+    monkeypatch.setenv("FERTILITY_MODEL_PATH", str(demo_model_path))
+    get_bundle.cache_clear()
+    client = TestClient(app)
+    response = client.post(
+        "/v1/agent/run",
+        json={
+            "intent": "assess_risk",
+            "record": {
+                "current_age": 31,
+                "residence": 2,
+                "education": 2,
+                "wealth": 3,
+                "in_union": 1,
+            },
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["tool_calls"][0]["tool"] == "predict_risk"
+    assert response.json()["tool_calls"][-1]["tool"] == "generate_report"
+
+    invalid_response = client.post("/v1/agent/run", json={"intent": "assess_risk"})
+    assert invalid_response.status_code == 422
+
+
+def test_agent_chat_plans_and_executes(monkeypatch, demo_model_path):
+    monkeypatch.setenv("FERTILITY_MODEL_PATH", str(demo_model_path))
+    get_bundle.cache_clear()
+    client = TestClient(app)
+    record = {
+        "current_age": 31,
+        "residence": 2,
+        "education": 2,
+        "wealth": 3,
+        "in_union": 1,
+    }
+    response = client.post(
+        "/v1/agent/chat",
+        json={"message": "Is profile ka risk score explain karo", "record": record},
+    )
+    assert response.status_code == 200
+    assert response.json()["plan"]["intent"] == "assess_risk"
+    assert response.json()["response"]["tool_calls"][0]["tool"] == "predict_risk"
+
+    missing_context = client.post(
+        "/v1/agent/chat", json={"message": "Compare both scenarios"}
+    )
+    assert missing_context.status_code == 422

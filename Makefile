@@ -1,4 +1,4 @@
-.PHONY: install demo test lint api dashboard docker clean
+.PHONY: install demo test agent-eval lint api dashboard docker clean
 
 install:
 	python -m pip install -e ".[app,dev,train]"
@@ -8,6 +8,9 @@ demo:
 
 test: demo
 	pytest
+
+agent-eval:
+	python scripts/evaluate_agent.py
 
 lint:
 	ruff check .

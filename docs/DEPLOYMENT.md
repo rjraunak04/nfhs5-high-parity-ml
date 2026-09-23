@@ -12,6 +12,9 @@ Confirm:
 ```bash
 curl http://localhost:8000/health
 curl http://localhost:8000/v1/model
+curl -X POST http://localhost:8000/v1/agent/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"How was the model validated?"}'
 ```
 
 ## Streamlit Community Cloud
@@ -22,7 +25,22 @@ curl http://localhost:8000/v1/model
 4. Keep `requirements.txt`, `models/demo_transport_model.joblib`, and the package source in the repository.
 5. After deployment, open the app from an incognito window and test one valid and one invalid input.
 
-No secret or DHS file is required for the synthetic demo.
+No secret or DHS file is required for the default synthetic demo.
+
+### Optional LLM routing
+
+The deployed app remains deterministic unless all three values are configured as environment
+secrets:
+
+```text
+FERTILITY_ENABLE_LLM=true
+FERTILITY_LLM_MODEL=gpt-4o-mini
+OPENAI_API_KEY=<deployment secret>
+```
+
+Never place the API key in GitHub files, Docker build arguments, screenshots, logs, or the dashboard.
+If the provider is unavailable, the app automatically returns to deterministic routing. Confirm the
+active provider in the dashboard's **Planner decision** panel.
 
 ## Container service
 
@@ -44,3 +62,10 @@ Before sharing the repository with recruiters, add:
 - a green Actions badge using the repository's real workflow URL;
 - a tagged release (`v0.1.0`);
 - a short demo recording in LinkedIn Featured.
+
+Before every agent-enabled release, also run:
+
+```bash
+python scripts/evaluate_agent.py
+pytest
+```

@@ -30,6 +30,8 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest --cov=src --cov-report=term-missing
+      - name: Agent routing and safety evaluation
+        run: python scripts/evaluate_agent.py
       - name: Runtime acceptance
         run: python scripts/day3_acceptance.py
       - name: Build container

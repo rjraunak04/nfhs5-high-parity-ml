@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -24,13 +25,15 @@ def wait_for(url: str, attempts: int = 60) -> tuple[int, str]:
 def main() -> None:
     processes = [
         subprocess.Popen(
-            ["uvicorn", "app.api:app", "--host", "127.0.0.1", "--port", "8000"],
+            [sys.executable, "-m", "uvicorn", "app.api:app", "--host", "127.0.0.1", "--port", "8000"],
             cwd=ROOT,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
         ),
         subprocess.Popen(
             [
+                sys.executable,
+                "-m",
                 "streamlit",
                 "run",
                 "app/dashboard.py",
